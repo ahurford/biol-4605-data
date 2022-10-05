@@ -22,7 +22,6 @@ sum(data.eq_null$res)
 SS.total = sum(data.eq_null$res2)
 
 # Data equations for the regression model
-
 # I need the fitted coefficients for the regression model
 # Do the regression
 reg <- lm(Pcorn~Psoil)
@@ -70,3 +69,28 @@ plot(data.eq_reg$rank, data.eq_reg$prob)
 # add regression line to last plot
 mod = lm(data.eq_reg$prob~data.eq_reg$rank)
 abline(mod)
+# New plot to check for residuals
+plot(Psoil,lag1-res)
+
+# A series of plots to check model assumpations.
+plot(reg)
+
+# Randomization function
+F.rand = function(x,y){
+result = replicate(1000,anova(lm(sample(y,length(y),TRUE)~x))$`F value`[1])
+}
+
+# Using the randomization function
+rand = F.rand(Psoil,Pcorn)
+F.p = data.frame(x = seq(1/1000,1,1/1000),F=sort(rand))
+plot(F.p$F,F.p$x, main = "Randomization", xlab = "F-value", ylab = "CDF")
+
+# Actual F-value from Corn data
+F.data <- anova(lm(Pcorn~Psoil))$`F value`[1]
+lines(c(F.data,F.data), c(0,1))
+
+# proportion of random results larger than F-value for data
+p1 = F.p$x[min(which(F.p$F>F.data))]
+
+lines(c(0,max(rand)),c(p1,p1))
+p=1-p1
