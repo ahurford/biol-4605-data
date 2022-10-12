@@ -1,4 +1,43 @@
 
+<<<<<<< HEAD
+=======
+# This imports the data into R from a website without needing to download
+data <- read.csv('https://raw.githubusercontent.com/ahurford/biol-4605-data/main/data/corn.csv', fill=TRUE)
+
+# Give the variables shorter names
+# Response variable
+Pcorn = data$Pcorn
+# Explanatory variable
+Psoil = data$Psoil
+
+# Plot the data. Does there look like there is a relationship?
+plot(Psoil, Pcorn)
+
+# Data equations for the null model
+data.eq_null = data.frame(Psoil = Psoil, Data = Pcorn, Model = rep(mean(Pcorn),length(Pcorn)), res = Pcorn-mean(Pcorn), res2 = (Pcorn-mean(Pcorn))^2)
+sum(data.eq_null$res)
+SS.total = sum(data.eq_null$res2)
+
+# Data equations for the regression model
+
+# I need the fitted coefficients for the regression model
+# Do the regression
+reg <- lm(Pcorn~Psoil)
+# see the results of your regression
+summary(reg)
+
+# Rename the estimated coefficients in the language of the assignment
+alpha <- unname(coef(reg)[1])
+beta <- unname(coef(reg)[2])
+
+# Use the data equation to find the fitted values
+fitted.values <- alpha+beta*Psoil
+
+# This is a plot of the regression (line), data (open circles), and the fitted values (solid circles)
+plot(Psoil,Pcorn)
+points(Psoil, fitted.values, pch = 19)
+abline(reg)
+>>>>>>> parent of c9de5ae (Update Ch9_1.R)
 
 # These are needed in the data.eq_reg table
 res = Pcorn-fitted.values
@@ -27,6 +66,7 @@ SS.res = sum(data.eq_reg$res2)
 #plot(data.eq_reg$Model, data.eq_reg$res)
 #plot(data.eq_reg$rank, data.eq_reg$prob)
 # add regression line to last plot
+<<<<<<< HEAD
 #mod = lm(data.eq_reg$prob~data.eq_reg$rank)
 #abline(mod)
 # New plot to check for residuals
@@ -58,3 +98,7 @@ p=1-p1
 # Likelihood ratio
 n = length(Pcorn)
 LR = (SS.res/SS.total)^(-n/2)
+=======
+mod = lm(data.eq_reg$prob~data.eq_reg$rank)
+abline(mod)
+>>>>>>> parent of c9de5ae (Update Ch9_1.R)
