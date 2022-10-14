@@ -1,4 +1,4 @@
-# Title: Chapter 10.2
+# Title: Chapter 10.2: One-way anova fixed effects
 # Author: Amy Hurford (ahurford@mun.ca)
 # Date: Oct 14, 2022
 # ------------
