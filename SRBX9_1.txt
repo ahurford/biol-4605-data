@@ -1,0 +1,45 @@
+380  1
+376  1
+360  1
+368  1
+372  1
+366  1
+374  1
+382  1
+350  2
+356  2
+358  2
+376  2
+338  2
+342  2
+366  2
+350  2
+344  2
+364  2
+354  3
+360  3
+362  3
+352  3
+366  3
+372  3
+362  3
+344  3
+342  3
+358  3
+351  3
+348  3
+348  3
+376  4
+344  4
+342  4
+372  4
+374  4
+360  4
+
+Width of scutum of tick larvae, in microns, from 4 hosts (rabbits)
+Data from Sokal and Rohlf 1969 Box 9.1  p208.
+
+MTB> read into c1 c2 'SRBOX9_1.dat';
+subc>nobs = 37.
+MTB> name c1 'width'
+MTB> name c2 'host'
