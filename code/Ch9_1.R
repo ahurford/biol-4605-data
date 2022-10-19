@@ -103,9 +103,11 @@ plot(reg)
 # Conceptually, under the null hypothesis any value of Pcorn could occur
 # for each of the measured Psoil values (recall the null hypothesis is that
 # Psoil has no effect)
-F.rand = function(x,y){
-result = replicate(1000,anova(lm(sample(y,length(y),TRUE)~x))$`F value`[1])
+F.rand = function(eta, y){
+result = replicate(1000,anova(lm(sample(y,length(y),TRUE)~eta))$`F value`[1])
 }
+
+
 
 # Using the randomization function and calling the result 'rand'
 rand = F.rand(Psoil,Pcorn)
