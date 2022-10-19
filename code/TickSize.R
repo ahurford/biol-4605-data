@@ -12,3 +12,10 @@ qqnorm(TSizeModel$residuals)
 anova(TSizeModel)    #To see ANOVA table
 LR<-(1-0.3236)^(-37/2)
 LR
+
+require(ggplot2)
+violin.plot <- ggplot(TickSize, aes(x=Host, y=Wscut)) + 
+  geom_violin() +
+  geom_boxplot(width = 0.2)+
+  geom_jitter(position=position_jitter(0.2))
+violin.plot
