@@ -1,3 +1,11 @@
+---
+title: "Untitled"
+author: "Amy Hurford"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
 # Title: Ch. 9.1 Linear regression explanatory variable fixed by experiment
 # Author: Amy Hurford (ahurford@mun.ca)
 # Date: Oct 12, 2022
@@ -144,3 +152,4 @@ LR = (SS.res/SS.total)^(-n/2)
 #plot(data.eq_reg$rank,data.eq_reg$prob)
 #abline(mod)
 
+```

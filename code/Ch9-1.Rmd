@@ -1,0 +1,139 @@
+---
+title: "Chapter 9.1: Linear regression explanatory variable fixed by experiment"
+author: "Amy Hurford (ahurford@mun.ca)"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+Here we show the R code to analyze the `Pcorn` data. We test the assumptions of the linear regression.
+
+As we find an assumption violation, we then perform a randomization to determine if the assumption violation matters.
+
+## Loading the data and doing the linear regression
+```{r}
+# This imports the data into R from a website without needing to download
+# Generally, click 'Raw' on the github website and copy url
+data <- read.csv('https://raw.githubusercontent.com/ahurford/biol-4605-data/main/data/corn.csv', fill=TRUE)
+
+# Give the variables shorter names: 
+# Response variable
+Pcorn = data$Pcorn
+# Explanatory variable
+Psoil = data$Psoil
+
+# Do the linear regression:
+reg <- lm(Pcorn~Psoil)
+# see the results of your regression
+summary(reg)
+```
+
+
+```{r}
+# Plot of the regression (line) and the data (open circles)
+plot(Psoil,Pcorn)
+abline(reg)
+```
+
+## Calculating the likelihood ratio
+Calculate the likelihood ratio for the evidence supporting the linear regression relative to a null model that for all values of phosphorous in the soil, the phosphorous in the corn is predicted as the mean recorded value.
+
+```{r}
+# NULL MODEL
+# Dataframe with the residuals and the residuals^2
+# Model values are equal to mean(Pcorn)
+data.eq_null = data.frame(Psoil = Psoil, Data = Pcorn, Model = rep(mean(Pcorn),length(Pcorn)), res = Pcorn-mean(Pcorn), res2 = (Pcorn-mean(Pcorn))^2)
+# Print this dataframe with the residuals and the residuals^2 for the null model
+data.eq_null
+```
+
+
+```{r}
+#The sum of the residuals should be 0. The sum of the residuals squared is the sum of squares total.
+sum(data.eq_null$res)
+SS.total = sum(data.eq_null$res2)
+SS.total #prints the value
+```
+
+
+```{r}
+# FULL MODEL
+# Similar to the data frame for the null model, but for the full model the model values are equal to reg$fitted.values (were reg is the linear regression model object)
+data.eq_full = data.frame(Psoil = Psoil, Data = Pcorn, Model = reg$fitted.values, res = Pcorn-reg$fitted.values, res2 = (Pcorn-reg$fitted.values)^2)
+# Print this dataframe with the residuals and the residuals^2 for the regression model
+data.eq_full
+```
+```{r}
+#The sum of the residuals should be 0. The sum of the residuals squared is the sum of squares residual.
+sum(data.eq_full$res)
+SS.res = sum(data.eq_full$res2)
+SS.res #prints the value
+```
+
+```{r}
+# Calculate the Likelihood ratio
+n = length(Pcorn)
+LR = (SS.res/SS.total)^(-n/2)
+LR # prints
+```
+
+## Model assumptions
+The plot function `plot()` applied to a model object (here `reg`) prints a series of graphs that visualize the agreement of the fitted model with the assumptions of the linear regression.
+```{r}
+# A series of plots to check model assumptions.
+plot(reg)
+```
+
+
+The Q-Q plot shows a poor agreement of the linear model residuals relative to a normal distribution. In particular, observations 3 and 7 are much further from the model predicted values than would be expected if the residuals were normally distributed.
+
+## Randomization
+Does this possible violation of the model assumptions change our conclusions?
+
+```{r, include=F}
+F.val = anova(lm(Pcorn~Psoil))$`Pr(>F)`[1]
+```
+
+The regression slope coefficient was `r round(coef(reg)[2],2)` with a p-value of `r round(F.val,1)` suggesting that the probability of observing these data, if there truly was no relationship between the phosphorous in the soil and in the corn (i.e., a Type II error) is `r round(10000*F.val,1)` out of 10000  *given that the assumptions of the general linear model are met*.
+
+From our Q-Q plot, we know that the assumptions of the general linear model are not met, but does this matter?
+
+To test this, we randomly assign values of `Pcorn` to values of `Psoil` as new hypothetical data. Conceptually, if there really is no relationship between `Psoil` and `Pcorn`, then any of the `Pcorn` values could have been reported for any of the `Psoil` measurements. How does an F-value calculated for the observed data, compare with an F-value calculated for data were `Pcorn` values are randomly assigned to any `Psoil` value?
+
+The function below completes 10000 replicates of hypothetical data sets that might be observed if there was truly no effect of `Psoil`: this is `sample(y,length(y),TRUE)`. Here `y` is the response variable supplied to the function, and we sample from `y` to make new response variable data of length `length(y)`. The sample is performed with replacement (`=TRUE`).
+
+The explanatory variable (in the function is `x`). In our application this will be `Psoil`, and this remains the same for all the regressions. From the regression we extract the F-value with `$`F value``.
+
+Below is a function, `F.rand()`, that is defined for any supplied `x` and `y`.
+
+```{r}
+F.rand = function(x,y){
+result = replicate(10000,anova(lm(sample(y,length(y),TRUE)~x))$`F value`[1])
+}
+```
+
+Note that randomly choosing an observed `Pcorn` value to be associated with an observed `Psoil` value makes different assumptions than the assumptions of the general linear model, so this approach serves to test the robustness of our conclusions to the assumptions of the general linear model (which our error diagnostic plots showed to be violated).
+
+```{r}
+# We use the function F.rand() and calculate 10000 F-values for random associations between Pcorn and Psoil.
+rand = F.rand(Psoil,Pcorn)
+# Prints the F-values for the first 6 random data sets:
+head(rand)
+```
+
+The F-value that we calculated from the data was quite large:
+```{r}
+F.data <- anova(lm(Pcorn~Psoil))$`F value`[1]
+F.data # prints
+```
+
+How many F-values from the randomizations are bigger than the F-value for the real data? We calculate this as:
+
+```{r}
+n.rand = length(which(rand>F.data))
+n.rand #prints
+```
+Under the assumptions of the general linear model we expected failure to reject the null hypothesis `r round(10000*F.val,1)` times out of 10,000. For the different assumptions of the randomization, we failed to reject the null hypothesis `r n.rand` times out of 10,000.
+
+However, in either case, it is extremely unlikely there is no relationship between `Psoil` and `Pcorn`: for the randomization is occurs `r n.rand/100`% of the time. Therefore, the violation of the general linear model assumptions, mean that we might not be able to interpret the reported p-vale as the probability of the Type II error, however, the conclusion that there is a relationship between `Psoil` and `Pcorn` is justified, even given the assumption violation shown in the QQ-plot.
