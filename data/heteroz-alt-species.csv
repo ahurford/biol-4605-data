@@ -1,4 +1,4 @@
-elevation-ft,	elevation_m, species, heterozygosity
+elevation-ft,	elevation_km, species, heterozygosity
 850, 0.25908, Dpers, 0.59
 3000, 0.9144, Dpers, 0.37
 4600, 1.40208, Dpers, 0.41
